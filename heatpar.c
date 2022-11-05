@@ -39,16 +39,20 @@ int main(int argc, char *argv[]) {
     }
 
     //algorithm
+    int threadcount = 4;
+    printf("Thread count: %d\n",threadcount);
     start = omp_get_wtime();
 
-    for (iter = 0; iter < input_iter; iter++){
-        for(i = 1; i < n_size-1; i++){
-            for(j = 1; j < n_size-1; j++){
-                h[i][j][(iter+1)%2] = 0.25 * (  h[i-1][j][iter%2] + h[i+1][j][iter%2] + h[i][j-1][iter%2] + h[i][j+1][iter%2]  );
-            }
-        }
-    }
     
+    for (iter = 0; iter < input_iter; iter++){
+        #pragma omp parallel for shared(h) private(i,j) num_threads(threadcount) collapse(2) schedule(guided)
+            for(i = 1; i < n_size-1; i++){
+                for(j = 1; j < n_size-1; j++){
+                    h[i][j][(iter+1)%2] = 0.25 * (  h[i-1][j][iter%2] + h[i+1][j][iter%2] + h[i][j-1][iter%2] + h[i][j+1][iter%2]  );
+                }
+            }
+    }
+        
     end = omp_get_wtime();
     printf("Time of computation: %f seconds\n", end-start);
 
@@ -60,7 +64,7 @@ int main(int argc, char *argv[]) {
     // }
 
     FILE *fwrite;
-    fwrite = fopen ("heatseq_output.txt", "w");
+    fwrite = fopen ("heatpar_output.txt", "w");
     for(i = 0; i < n_size; i++){
         for(j = 0; j < n_size; j++){
             fprintf(fwrite, "%f ", h[i][j][(input_iter+1)%2]);
