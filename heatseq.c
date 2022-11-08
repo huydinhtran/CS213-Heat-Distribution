@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     int p = (int)(n_size / 8);
     for (i = 0; i < n_size; i += p){
         for (j = 0; j < n_size; j += p){
-            printf("%lf ", h[i][j][(input_iter+1)%2]);
+            printf("%lf ", h[i][j][input_iter%2]);
         }
         printf("\n");
     }
@@ -86,20 +86,20 @@ int main(int argc, char *argv[]) {
     // // Print whole matrix
     // for (i = 0; i < n_size+1; i ++){
     //     for (j = 0; j < n_size+1; j ++){
-    //         printf("%lf ", h[i][j][(input_iter+1)%2]);
+    //         printf("%lf ", h[i][j][input_iter%2]);
     //     }
     //     printf("\n");
     // }
 
-    // // Write rounded output into text file for graphing
-    // FILE *fwrite;
-    // fwrite = fopen ("heatseq_output.txt", "w");
-    // for(i = 0; i < n_size+1; i++){
-    //     for(j = 0; j < n_size+1; j++){
-    //         fprintf(fwrite, "%d ", round_out(h[i][j][(input_iter+1)%2]));
-    //     }
-    //     fprintf(fwrite, "\n");
-    // }
+    // Write rounded output into text file for graphing
+    FILE *fwrite;
+    fwrite = fopen ("heatseq_output.txt", "w");
+    for(i = 0; i < n_size+1; i++){
+        for(j = 0; j < n_size+1; j++){
+            fprintf(fwrite, "%d ", round_out(h[i][j][(input_iter+1)%2]));
+        }
+        fprintf(fwrite, "\n");
+    }
 
     return(0);
 }
