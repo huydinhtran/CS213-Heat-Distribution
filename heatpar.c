@@ -2,6 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int round_out(float n)
+{
+    // Smaller multiple
+    int a = (int)(n / 10) * 10;
+     
+    // Larger multiple
+    int b = (int)(a + 10);
+ 
+    // Return of closest of two
+    return (n - a > b - n)? b : a;
+}
+
 int main(int argc, char *argv[]) {
     argc == 3;
 
@@ -16,7 +28,6 @@ int main(int argc, char *argv[]) {
 
     double ***h = (double***)malloc((n_size+1)*sizeof(double**));
     
-    #pragma omp parallel for shared(h) private(i,j) num_threads(8)
     for (i = 0; i < n_size+1; i++) {
         h[i] = (double**)malloc((n_size+1)*sizeof(double*));
         for (j = 0; j < n_size+1; j++) {
@@ -25,27 +36,33 @@ int main(int argc, char *argv[]) {
     }
 
     //initializing
-    #pragma omp parallel for shared(h) private(i,j) num_threads(8) collapse(2)
-    for(i = 1; i < n_size; i++){
-        for(j = 0; j < n_size; j++){
+    for(i = 0; i < n_size+1; i++){
+        for(j = 0; j < n_size+1; j++){
             h[i][j][0] = 0.0;
             h[i][j][1] = 0.0;
         }
     }
 
-    #pragma omp parallel for shared(h) private(i,j) num_threads(8)
-    for(j = 0; j < n_size; j++){
+    for(i = 0; i < n_size+1; i++){
+        h[i][0][0] = 20.0;
+        h[i][0][1] = 20.0;
+        h[n_size][i][0] = 20.0;
+        h[n_size][i][1] = 20.0;
+        h[0][i][0] = 20.0;
+        h[0][i][1] = 20.0;
+        h[i][n_size][0] = 20.0;
+        h[i][n_size][1] = 20.0;
+    }
+
+    for(j = 0; j < n_size+1; j++){
         if(  (j >= (n_size * 0.3)) && (j < (n_size * 0.7))  ){
             h[0][j][0] = 100.0;
             h[0][j][1] = 100.0;
-        }else{
-            h[0][j][0] = 20.0;
-            h[0][j][1] = 20.0;
         }
     }
 
     //algorithm
-    int threadcount = 8;
+    int threadcount = 16;
     printf("Thread count: %d\n",threadcount);
     start = omp_get_wtime();
 
@@ -57,11 +74,9 @@ int main(int argc, char *argv[]) {
                 }
             }
     }
-        
+    
     end = omp_get_wtime();
     printf("Time of computation: %f seconds\n", end-start);
-
-
 
     int p = (int)(n_size / 8);
     for (i = 0; i < n_size; i += p){
@@ -71,11 +86,20 @@ int main(int argc, char *argv[]) {
         printf("\n");
     }
 
+    // // Print whole matrix
+    // for (i = 0; i < n_size+1; i ++){
+    //     for (j = 0; j < n_size+1; j ++){
+    //         printf("%lf ", h[i][j][(input_iter+1)%2]);
+    //     }
+    //     printf("\n");
+    // }
+
+    // // Write rounded output into text file for graphing
     // FILE *fwrite;
     // fwrite = fopen ("heatpar_output.txt", "w");
-    // for(i = 0; i < n_size; i++){
-    //     for(j = 0; j < n_size; j++){
-    //         fprintf(fwrite, "%f ", h[i][j][(input_iter+1)%2]);
+    // for(i = 0; i < n_size+1; i++){
+    //     for(j = 0; j < n_size+1; j++){
+    //         fprintf(fwrite, "%d ", round_out(h[i][j][(input_iter+1)%2]));
     //     }
     //     fprintf(fwrite, "\n");
     // }
