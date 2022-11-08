@@ -94,15 +94,15 @@ int main(int argc, char *argv[]) {
     //     printf("\n");
     // }
 
-    // Write rounded output into text file for graphing
-    FILE *fwrite;
-    fwrite = fopen ("heatpar_output.txt", "w");
-    for(i = 0; i < n_size+1; i++){
-        for(j = 0; j < n_size+1; j++){
-            fprintf(fwrite, "%d ", round_out(h[i][j][(input_iter+1)%2]));
-        }
-        fprintf(fwrite, "\n");
-    }
+    // // Write rounded output into text file for graphing
+    // FILE *fwrite;
+    // fwrite = fopen ("heatpar_output.txt", "w");
+    // for(i = 0; i < n_size+1; i++){
+    //     for(j = 0; j < n_size+1; j++){
+    //         fprintf(fwrite, "%d ", round_out(h[i][j][(input_iter+1)%2]));
+    //     }
+    //     fprintf(fwrite, "\n");
+    // }
 
     return(0);
 }
